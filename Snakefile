@@ -1,8 +1,11 @@
 SAMPLE='data/genome-s10+s11.fa.gz'
 QUERY='data/genome-s10.fa.gz'
+OUTPUT_DIR='outputs'
+SAMPLE_PREP=os.path.join(OUTPUT_DIR, 'prep.sample')
+QUERY_PREP=os.path.join(OUTPUT_DIR, 'prep.query')
 
 rule prepare_sample:
-    output: directory("prep.sample")
+    output: directory(SAMPLE_PREP)
     shell: """
        rm -fr {output}
        mkdir -p {output}
@@ -10,7 +13,7 @@ rule prepare_sample:
     """
 
 rule prepare_query:
-    output: directory("prep.query")
+    output: directory(QUERY_PREP)
     shell: """
        rm -fr {output}
        mkdir -p {output}
@@ -19,14 +22,17 @@ rule prepare_query:
 
 rule do_query:
     input:
-        query = "prep.query/query.sig",
-        sample = "prep.sample/sample.sig",
+        query = f"{QUERY_PREP}/query.sig",
+        sample = f"{SAMPLE_PREP}/sample.sig",
     output: directory("results")
     shell: """
        rm -fr {output}
        mkdir -p {output}
-       sourmash search --containment prep.query/query.sig prep.sample/sample.sig -o {output}/results.csv
+       sourmash search --containment {input.query} {input.sample} -o {output}/results.csv
     """
 
 rule install_software:
-    shell: ""
+    conda: "conf/env/sourmash4.yml"
+    shell: """
+       sourmash --version
+    """
