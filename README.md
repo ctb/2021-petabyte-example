@@ -2,4 +2,4 @@
 
 ## quickstart
 
-Run `./runme.py`.
+Run `./runme.py conf-basic.yml data/genome-s10.fa.gz`
